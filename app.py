@@ -9,16 +9,17 @@ from langchain.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from termcolor import colored
 
-# Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 torch.set_default_tensor_type(torch.FloatTensor)
 
-# Model configuration
 model_path = "meta-llama/Llama-2-13b-chat-hf"
 tokenizer = AutoTokenizer.from_pretrained(model_path)
-model = AutoModelForCausalLM.from_pretrained(model_path, device_map='auto', torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2")
+model = AutoModelForCausalLM.from_pretrained(
+    model_path, device_map='auto', 
+    # torch_dtype=torch.bfloat16, 
+    # attn_implementation="flash_attention_2"
+    )
 
-# Helper functions
 def print_red(text):
     print(colored(text, 'red'))
 
@@ -48,16 +49,14 @@ def generate_text(prompt):
     return cleaned_text
 
 def main():
-    # UI Configuration
     st.set_page_config(page_title="Support Inquiry", page_icon=":house_with_garden:")
-    st.title("Support Services for Single Moms in Newark")
-    
+    st.title("Government Support Services in Newark")
+
     support_option = st.selectbox("Select Support Category", ["Housing Support", "Childcare Support", "Education Support"])
 
     programs_dir = f'programs/{support_option.replace(" ", "_").lower()}'
     output_file = tempfile.mktemp(suffix='.txt')
 
-    # Read and merge documents
     with open(output_file, 'w', encoding='utf-8') as outfile:
         for filename in os.listdir(programs_dir):
             filepath = os.path.join(programs_dir, filename)
@@ -65,12 +64,19 @@ def main():
                 with open(filepath, 'r', encoding='utf-8') as readfile:
                     outfile.write(readfile.read() + '\n')
 
-    # Setup for document retrieval and question answering
     loader = TextLoader(file_path=output_file)
     documents = loader.load()
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     docs = text_splitter.split_documents(documents)
-    embeddings = HuggingFaceEmbeddings()
+    # embeddings = HuggingFaceEmbeddings()
+    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_kwargs = {'device': 'cpu'}
+    encode_kwargs = {'normalize_embeddings': False}
+    embeddings = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
+    )
     persist_path = os.path.join(tempfile.gettempdir(), f"{support_option.replace(' ', '_').lower()}_vector_store.parquet")
 
     vector_store = SKLearnVectorStore.from_documents(
@@ -81,35 +87,44 @@ def main():
     )
 
     question = st.text_input("How can we assist you today?", "")
+    follow_up_question = st.text_input("Have a follow-up question? Ask here:", "")
 
-    if st.button("Ask"):
-        if question:
-            ethical_check_prompt = f"Reviewing the ethics of the request: {question}"
-            is_ethical = is_request_ethical(ethical_check_prompt)
-            if not is_ethical:
-                st.error("This request is not allowed, please try again.")
-            else:
-                with st.spinner('Searching for relevant information...'):
-                    context = retrieve_document(question, vector_store)
-                    if context == "No relevant document found.":
-                        st.error(context)
-                    else:
-                        prompt = f'''
-                        Question: {question}
+    if st.button("Ask") and question:
+        context = retrieve_document(question, vector_store)
+        if context != "No relevant document found.":
+            prompt = f'''
+            Question: {question}
 
-                        Context: {context}
+            Context: {context}
 
-                        Response:
-                        '''
+            Response:
+            '''
+            answer = generate_text(prompt)
+            st.text_area("Response", answer, height=300)
+            st.session_state['context'] = context  #
+            st.session_state['previous_answer'] = answer  
 
-                        answer = generate_text(prompt)
-                        st.text_area("Response", answer, height=300)
-        else:
-            st.error("Please enter a question.")
+    if follow_up_question and 'context' in st.session_state and st.button("Ask Follow-Up"):
+        new_context = retrieve_document(follow_up_question, vector_store)  
+        previous_answer = st.session_state['previous_answer']
+        prompt = f'''
+        Previous Question and Answer: {previous_answer}
 
-    # Community Forum Feature
+        Follow-Up Question: {follow_up_question}
+
+        New Context: {new_context}
+
+        Response:
+        '''
+        follow_up_answer = generate_text(prompt)
+        st.text_area("Follow-Up Response", follow_up_answer, height=300)
+
     if 'forum_posts' not in st.session_state:
-        st.session_state.forum_posts = []
+        st.session_state.forum_posts = [
+            "Successfully Navigated Childcare Support Application: Just wanted to share my experience with the childcare support application process. It was daunting at first, but thanks to the guidance I found here and the clear instructions provided by the service, I was able to complete my application successfully.",
+            "Housing Support Inquiry: Has anyone here applied for housing support recently? I'm looking for some tips on how to ensure my application is processed smoothly.",
+            "Education Support Programs: Can anyone recommend education support programs for single parents? I'm trying to find something that can help me balance my studies while taking care of my kids."
+        ]
 
     def submit_post():
         new_post = st.session_state.new_post 
