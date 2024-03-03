@@ -117,7 +117,7 @@ def forum_page():
     if 'forum_posts' not in st.session_state:
         st.session_state.forum_posts = [
             {"id": 1, "author": "John Smith", "content": "Just wanted to share my experience with the childcare support application process. It was daunting at first, but thanks to the guidance I found here and the clear instructions provided by the service, I was able to complete my application successfully.", "replies": []},
-            {"id": 2, "author": "Jane Doe", "content": "Has anyone here applied for housing support recently? I'm looking for some tips on how to ensure my application is processed smoothly.", "replies": [{"author": "Responder Name", "content": "I applied last month and found that having all my documents prepared in advance was really helpful.", "replies": []}]},
+            {"id": 2, "author": "Jane Doe", "content": "Has anyone here applied for housing support recently? I'm looking for some tips on how to ensure my application is processed smoothly.", "replies": [{"author": "Jim Brown", "content": "I applied last month and found that having all my documents prepared in advance was really helpful.", "replies": []}]},
             {"id": 3, "author": "Craig Johnson", "content": "Can anyone recommend education support programs for single parents? I'm trying to find something that can help me balance my studies while taking care of my kids.", "replies": []}
         ]
 
