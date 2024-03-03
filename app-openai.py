@@ -54,7 +54,7 @@ def main_page():
     st.title("govAIde")
     st.subheader("Government Support Services in Delaware")
     
-    support_option = st.selectbox("Select Support Category", ["Housing Support", "Childcare Support", "Education Support", "Job Search"])
+    support_option = st.selectbox("Select Support Category", ["Housing Support", "Childcare Support", "Education Support", "Food Support", "Job Search", "Apartment Search"])
     programs_dir = f'programs/{support_option.replace(" ", "_").lower()}'
     output_file = tempfile.mktemp(suffix='.txt')
 

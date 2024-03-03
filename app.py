@@ -25,6 +25,7 @@ model = AutoModelForCausalLM.from_pretrained(
     torch_dtype=torch.bfloat16
 )
 
+hat
 
 def print_red(text):
     """Print text in red color."""
@@ -69,7 +70,7 @@ def main_page():
     st.title("govAIde")
     st.subheader("Government Support Services in Delaware")
     
-    support_option = st.selectbox("Select Support Category", ["Housing Support", "Childcare Support", "Education Support", "Job Search"])
+    support_option = st.selectbox("Select Support Category", ["Housing Support", "Childcare Support", "Education Support", "Job Search", "Apartment Search"])
     programs_dir = f'programs/{support_option.replace(" ", "_").lower()}'
     output_file = tempfile.mktemp(suffix='.txt')
 
