@@ -4,7 +4,7 @@ import tempfile
 from langchain.vectorstores import SKLearnVectorStore
 from langchain.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
-from termcolor import colored
+# from termcolor import colored
 from langchain_openai import OpenAIEmbeddings
 from openai import OpenAI
 
@@ -14,9 +14,9 @@ from openai import OpenAI
 client=OpenAI()
 
 
-def print_red(text):
-    """Print text in red color."""
-    print(colored(text, 'red'))
+# def print_red(text):
+#     """Print text in red color."""
+#     print(colored(text, 'red'))
 
 # def is_request_ethical(prompt):
 #     """Check if a request is ethical."""
@@ -30,10 +30,10 @@ def retrieve_document(question, vector_store):
     """Perform RAG"""
     docs = vector_store.similarity_search(question)
     if docs:
-        print_red(docs[0].page_content) 
+        # print_red(docs[0].page_content) 
         return docs[0].page_content + docs[1].page_content
     else:
-        print("No relevant document found.")
+        # print("No relevant document found.")
         return "No relevant document found."
 
 def generate_text(prompt):
