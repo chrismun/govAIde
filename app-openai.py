@@ -1,6 +1,6 @@
 import streamlit as st
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, AutoModel
+# import torch
+# from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, AutoModel
 import os
 import tempfile
 from langchain.vectorstores import SKLearnVectorStore
@@ -11,7 +11,7 @@ from langchain_openai import OpenAIEmbeddings
 from openai import OpenAI
 
 
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ["OPENAI_API_KEY"] = 'key'
 
 client=OpenAI()
 
