@@ -1,6 +1,4 @@
 import streamlit as st
-# import torch
-# from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, AutoModel
 import os
 import tempfile
 from langchain.vectorstores import SKLearnVectorStore
@@ -11,23 +9,9 @@ from langchain_openai import OpenAIEmbeddings
 from openai import OpenAI
 
 
-os.environ["OPENAI_API_KEY"] = 'key'
+# os.environ["OPENAI_API_KEY"] = 'key'
 
 client=OpenAI()
-
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# model_path = "lmsys/vicuna-7b-v1.5"
-# tokenizer = AutoTokenizer.from_pretrained(model_path)
-
-# model = AutoModelForCausalLM.from_pretrained(
-#     model_path, 
-#     device_map='auto', 
-#     attn_implementation="flash_attention_2", 
-#     do_sample=True,
-#     top_p=0.2,
-#     temperature=0.2,
-#     torch_dtype=torch.bfloat16
-# )
 
 
 def print_red(text):
